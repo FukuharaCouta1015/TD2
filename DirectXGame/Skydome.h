@@ -1,7 +1,6 @@
 #pragma once
 #include <kamataEngine.h>
 
-
 class Skydome {
 public:
 	// 初期化
