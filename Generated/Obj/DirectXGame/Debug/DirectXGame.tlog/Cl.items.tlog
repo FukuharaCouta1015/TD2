@@ -2,10 +2,11 @@ C:\Users\daido\source\repos\TD2\DirectXGame\CameraController.cpp;C:\Users\daido\
 C:\Users\daido\source\repos\TD2\DirectXGame\DeathParticles.cpp;C:\Users\daido\source\repos\TD2\Generated\Obj\DirectXGame\Debug\DeathParticles.obj
 C:\Users\daido\source\repos\TD2\DirectXGame\Enemy.cpp;C:\Users\daido\source\repos\TD2\Generated\Obj\DirectXGame\Debug\Enemy.obj
 C:\Users\daido\source\repos\TD2\DirectXGame\Fade.cpp;C:\Users\daido\source\repos\TD2\Generated\Obj\DirectXGame\Debug\Fade.obj
-C:\Users\daido\source\repos\TD2\DirectXGame\GameScene.cpp;C:\Users\daido\source\repos\TD2\Generated\Obj\DirectXGame\Debug\GameScene.obj
+C:\Users\daido\source\repos\TD2\DirectXGame\Engine\Scene\SceneManager.cpp;C:\Users\daido\source\repos\TD2\Generated\Obj\DirectXGame\Debug\SceneManager.obj
+C:\Users\daido\source\repos\TD2\DirectXGame\Engine\Scene\GameScene.cpp;C:\Users\daido\source\repos\TD2\Generated\Obj\DirectXGame\Debug\GameScene.obj
 C:\Users\daido\source\repos\TD2\DirectXGame\main.cpp;C:\Users\daido\source\repos\TD2\Generated\Obj\DirectXGame\Debug\main.obj
 C:\Users\daido\source\repos\TD2\DirectXGame\MapChipField.cpp;C:\Users\daido\source\repos\TD2\Generated\Obj\DirectXGame\Debug\MapChipField.obj
 C:\Users\daido\source\repos\TD2\DirectXGame\MyMath.cpp;C:\Users\daido\source\repos\TD2\Generated\Obj\DirectXGame\Debug\MyMath.obj
 C:\Users\daido\source\repos\TD2\DirectXGame\Player.cpp;C:\Users\daido\source\repos\TD2\Generated\Obj\DirectXGame\Debug\Player.obj
 C:\Users\daido\source\repos\TD2\DirectXGame\Skydome.cpp;C:\Users\daido\source\repos\TD2\Generated\Obj\DirectXGame\Debug\Skydome.obj
-C:\Users\daido\source\repos\TD2\DirectXGame\TitleScene.cpp;C:\Users\daido\source\repos\TD2\Generated\Obj\DirectXGame\Debug\TitleScene.obj
+C:\Users\daido\source\repos\TD2\DirectXGame\Engine\Scene\TitleScene.cpp;C:\Users\daido\source\repos\TD2\Generated\Obj\DirectXGame\Debug\TitleScene.obj

@@ -2,6 +2,7 @@
   DeathParticles.cpp
   Enemy.cpp
   Fade.cpp
+  SceneManager.cpp
   GameScene.cpp
   main.cpp
   MapChipField.cpp
