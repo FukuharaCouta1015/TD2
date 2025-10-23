@@ -5,7 +5,6 @@
 
 class MapChipField;
 
-class Enemy;
 class Player {
 
 
@@ -22,7 +21,7 @@ public:
 
 	AABB GetAABB();
 
-	void OnCollision(const Enemy* enemy);
+	/*void OnCollision(const Enemy* enemy);*/
 	// デスフラグのゲッター
 	bool isDead() const { return isDead_; }
 

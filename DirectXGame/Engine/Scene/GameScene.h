@@ -1,14 +1,12 @@
 #pragma once
 #include <kamataEngine.h>
 #include <vector>
-#include "Player.h"
 #include "Skydome.h"
 #include <map>
 #include "MapChipField.h"
-#include "CameraController.h"
-#include "Enemy.h"
-#include "DeathParticles.h"
 #include "Fade.h"
+
+class Mino;
 
 class GameScene {
 public:
@@ -18,7 +16,7 @@ public:
 
 	std::vector <std::vector<KamataEngine::WorldTransform*>> WorldTransformBlocks_;
 
-	bool isDebugCameraActive_ = false;
+	bool isDebugCameraActive_ = true;
 
 	void Initialize();
 	// 更新
@@ -26,6 +24,7 @@ public:
 	// 描画
 	void Draw();
 
+	// ブロックの生成
 	void GenerateBlocks();
 
 	void CheckAllCollision();
@@ -39,13 +38,9 @@ public:
 	MapChipField* mapChipField_ = nullptr;
 
 	bool IsFinished() const { return finished_; }
-	
 
-
-	// モデル	
+	// モデル
 	KamataEngine::Model* model_ = nullptr;
-	//モデルエネミー
-	KamataEngine::Model* modelEnemy_ = nullptr;
 	//ブロック
 	KamataEngine::Model* modelBlock_ = nullptr;	
 	//天球
@@ -70,14 +65,10 @@ public:
 
 private:
 	uint32_t textureHandle_ = 0;
-	// プレイヤー
-	Player* player_ = nullptr;
 	Skydome* skydome_ = nullptr;
-	std::list<Enemy*> enemies_;
-	CameraController* cameraController_ = nullptr;
-	DeathParticles* deathParticles_ = nullptr;
-	KamataEngine::Model* modelDeathParticles_ = nullptr;
 	bool finished_ = false; // ゲームシーンが終了したかどうか
 	Fade* fade_ = nullptr;  // フェードオブジェクト
 
+	// ミノ
+	Mino* mino_;
 };

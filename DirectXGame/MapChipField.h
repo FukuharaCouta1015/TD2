@@ -30,8 +30,8 @@ public:
 	static inline const float kBlockWidth = 1.0f;
 	static inline const float kBlockHeight = 1.0f;
 
-	static inline const uint32_t kNumBlocksHorizontal = 100;
-	static inline const uint32_t kNumBlocksVertical = 20;
+	static inline const uint32_t kNumBlocksHorizontal = 12;
+	static inline const uint32_t kNumBlocksVertical = 21;
 
 	uint32_t GetNumBlockHorizontal()const { return kNumBlocksHorizontal; }
 	uint32_t GetNumBlockVertical() const { return kNumBlocksVertical; }
@@ -52,7 +52,7 @@ public:
 		uint32_t yIndex;
 	};
 
-	IndexSet GetMapChipIndexSetByPosition(const KamataEngine::Vector3& position); 
+	IndexSet GetMapChipIndexByPosition(const KamataEngine::Vector3& position); 
 
 private:
 
