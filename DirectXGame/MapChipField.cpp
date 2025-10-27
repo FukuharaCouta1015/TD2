@@ -5,25 +5,24 @@
 #include <sstream>
 #include <vector>
 
-
 std::map<std::string, MapChipType> mapChipTable = {
     {"0", MapChipType::kBlank},
     {"1", MapChipType::kBlock},
+    {"2", MapChipType::kMino },
 };
 
-//ブロックの範囲取得関数
-MapChipField::Rect MapChipField::GetRectByIndex(uint32_t xIndex, uint32_t yIndex) { 
+// ブロックの範囲取得関数
+MapChipField::Rect MapChipField::GetRectByIndex(uint32_t xIndex, uint32_t yIndex) {
 
 	KamataEngine::Vector3 center = GetMapChipPositionByIndex(xIndex, yIndex);
 
-	Rect rect ;
+	Rect rect;
 	rect.left = center.x - kBlockWidth / 2.0f;
 	rect.right = center.x + kBlockWidth / 2.0f;
 	rect.bottom = center.y - kBlockHeight / 2.0f;
 	rect.top = center.y + kBlockHeight / 2.0f;
 
 	return rect;
-
 }
 
 void MapChipField::ResetMapChipData() {
@@ -42,8 +41,8 @@ void MapChipField::LodeMapChipCsv(const std::string& filePaht) {
 	// ファイルを開く
 	std::ifstream file;
 	file.open(filePaht);
-	//assert(file.is_open());
-	// マップチップcsv
+	// assert(file.is_open());
+	//  マップチップcsv
 	std::stringstream mapChipCsv;
 	// ファイルの内容を文字列ストリームにコピー
 	mapChipCsv << file.rdbuf();
@@ -63,14 +62,13 @@ void MapChipField::LodeMapChipCsv(const std::string& filePaht) {
 
 			if (mapChipTable.contains(word)) {
 				mapChipData_.data_[i][j] = mapChipTable[word];
-
 			}
 		}
 	}
 }
 
-MapChipType MapChipField::GetMapChipTypeByIndex(uint32_t xIndex, uint32_t yIndex) { 
-	if (xIndex <0 ||kNumBlocksHorizontal - 1< xIndex) {
+MapChipType MapChipField::GetMapChipTypeByIndex(uint32_t xIndex, uint32_t yIndex) {
+	if (xIndex < 0 || kNumBlocksHorizontal - 1 < xIndex) {
 		return MapChipType::kBlank;
 	}
 	if (yIndex < 0 || kNumBlocksVertical - 1 < yIndex) {
@@ -83,11 +81,11 @@ KamataEngine::Vector3 MapChipField::GetMapChipPositionByIndex(uint32_t xIndex, u
 	return KamataEngine::Vector3(kBlockWidth * xIndex, kBlockHeight * (kNumBlocksVertical - 1 - yIndex), 0);
 }
 
-MapChipField::IndexSet MapChipField::GetMapChipIndexByPosition(const KamataEngine::Vector3& position) { 
-	
+MapChipField::IndexSet MapChipField::GetMapChipIndexByPosition(const KamataEngine::Vector3& position) {
+
 	IndexSet indexSet = {};
-	indexSet.xIndex = static_cast<uint32_t>((position.x + kBlockWidth / 2) / kBlockWidth); 
+	indexSet.xIndex = static_cast<uint32_t>((position.x + kBlockWidth / 2) / kBlockWidth);
 	indexSet.yIndex = kNumBlocksVertical - 1 - static_cast<uint32_t>((position.y + kBlockHeight / 2) / kBlockHeight);
 
-    return indexSet;
+	return indexSet;
 }

@@ -1,2 +1,15 @@
-﻿  Mino.cpp
-  DirectXGame.vcxproj -> C:\Users\daido\source\repos\TD2\Generated\Outputs\Debug\DirectXGame.exe
+﻿  CameraController.cpp
+  DeathParticles.cpp
+  Enemy.cpp
+  Fade.cpp
+  SceneManager.cpp
+  GameScene.cpp
+  main.cpp
+  MapChipField.cpp
+  Mino.cpp
+  MyMath.cpp
+  Player.cpp
+  Skydome.cpp
+  TitleScene.cpp
+  WorldTransform.cpp
+  DirectXGame.vcxproj -> C:\Users\GSUser\Desktop\k024g0080\Generated\Outputs\Debug\DirectXGame.exe
