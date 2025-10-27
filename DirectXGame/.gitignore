@@ -13,6 +13,9 @@
 # User-specific files (MonoDevelop/Xamarin Studio)
 *.userprefs
 
+# My Ignore
+Generated/
+
 # Mono auto generated filesmono_crash.*
 
 # Build results
