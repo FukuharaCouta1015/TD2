@@ -14,7 +14,7 @@
 *.userprefs
 
 # My Ignore
-/Generated/
+Generated/
 
 # Mono auto generated filesmono_crash.*
 
