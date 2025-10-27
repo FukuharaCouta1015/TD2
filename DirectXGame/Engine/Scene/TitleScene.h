@@ -5,8 +5,6 @@
 #include "Fade.h"
 
 class TitleScene {
-
-	
 public:
 
 	// シーンのフェーズ
