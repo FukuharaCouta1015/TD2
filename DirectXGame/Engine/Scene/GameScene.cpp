@@ -157,12 +157,7 @@ void GameScene::GenerateBlocks() {
 	for (uint32_t i = 0; i < numBlocksVertical; ++i) {
 
 		for (uint32_t j = 0; j < numBlocksHorizontal; ++j) {
-			if (mapChipField_->GetMapChipTypeByIndex(j, i) == MapChipType::kBlock) {
-				WorldTransform* worldTransform = new WorldTransform();
-				worldTransform->Initialize();
-				WorldTransformBlocks_[i][j] = worldTransform;
-				WorldTransformBlocks_[i][j]->translation_ = mapChipField_->GetMapChipPositionByIndex(j, i);
-			} else if (mapChipField_->GetMapChipTypeByIndex(j, i) == MapChipType::kMino) {
+			if (mapChipField_->GetMapChipTypeByIndex(j, i) != MapChipType::kBlank) {
 				WorldTransform* worldTransform = new WorldTransform();
 				worldTransform->Initialize();
 				WorldTransformBlocks_[i][j] = worldTransform;
