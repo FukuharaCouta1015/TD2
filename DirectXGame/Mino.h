@@ -22,11 +22,11 @@ public:
 
 	~Mino() = default;
 
+	void Rotate();
+
 private:
 	// 移動
 	void Move();
-	// 当たり判定
-	bool CheckCollision();
 
 private:
 	// ワールドトランスフォーム
@@ -52,4 +52,9 @@ private:
 	// 親が保持する「生成用」モデルとカメラ（子削除時の誤クリア対策）
 	KamataEngine::Model* prototypeModel_ = nullptr;
 	KamataEngine::Camera* prototypeCamera_ = nullptr;
+	// 回転中心のインデックス
+	int rotationCenterIndex_ = -1;
+
+	bool CheckCollision(const std::vector<KamataEngine::Vector3>& tentativeBlockPositions);
+
 };

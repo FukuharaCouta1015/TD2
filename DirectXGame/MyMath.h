@@ -1,7 +1,7 @@
 #pragma once
 
 #include "kamataEngine.h"
-
+using namespace KamataEngine;
 /// <summary>
 ///アフィン変換
 /// </summary>
@@ -15,3 +15,6 @@ struct AABB {
 };
 
 bool IsCollision(const AABB& aabb1, const AABB& aabb2);
+
+Vector3 operator+(Vector3& lhs, const Vector3& rhv);
+Vector3 operator-(Vector3& lhs, const Vector3& rhv);

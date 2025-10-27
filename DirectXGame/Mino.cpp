@@ -34,7 +34,9 @@ void Mino::Update() {
 	// 親インスタンスが管理するミノ群の移動はここで一括制御する
 	// フレームカウントは親で管理
 	++frameCount;
-
+	if (Input::GetInstance()->TriggerKey(DIK_W)) {
+		Rotate();
+	}
 	// 入力での横移動を決定（-1:左, +1:右, 0:なし）
 	int dx = 0;
 	if (Input::GetInstance()->TriggerKey(DIK_A)) {
@@ -159,8 +161,21 @@ void Mino::Move() {
 }
 
 // 当たり判定（個別は不要になったが安全のため残す）
-bool Mino::CheckCollision() {
-	// 旧個別チェックは使わない。親の Update で一括処理しているため false を返す。
+bool Mino::CheckCollision(const std::vector<Vector3>& tentativeBlockPositions) {
+	if (!mapChipField_) {
+		return true;
+	}
+	for (const auto& pos : tentativeBlockPositions) {
+		MapChipField::IndexSet indexSet = mapChipField_->GetMapChipIndexByPosition(pos);
+		int xIndex = static_cast<int>(indexSet.xIndex);
+		int yIndex = static_cast<int>(indexSet.yIndex);
+		if (xIndex < 0 || xIndex >= mapChipField_->kNumBlocksHorizontal || yIndex < 0 || yIndex >= mapChipField_->kNumBlocksVertical) {
+			return true;
+		}
+		if (mapChipField_->GetMapChipTypeByIndex(xIndex, yIndex) == MapChipType::kBlock) {
+			return true;
+		}
+	}
 	return false;
 }
 
@@ -193,42 +208,49 @@ void Mino::GenerateMino(Model* model, Camera* camera) {
 		minoPos[1] = mapChipField_->GetMapChipPositionByIndex(5, 0);
 		minoPos[2] = mapChipField_->GetMapChipPositionByIndex(6, 0);
 		minoPos[3] = mapChipField_->GetMapChipPositionByIndex(7, 0);
+		rotationCenterIndex_ = 1;
 		break;
 	case MinoType::O:
 		minoPos[0] = mapChipField_->GetMapChipPositionByIndex(5, 0);
 		minoPos[1] = mapChipField_->GetMapChipPositionByIndex(6, 0);
 		minoPos[2] = mapChipField_->GetMapChipPositionByIndex(5, 1);
 		minoPos[3] = mapChipField_->GetMapChipPositionByIndex(6, 1);
+		rotationCenterIndex_ = -1;
 		break;
 	case MinoType::S:
 		minoPos[0] = mapChipField_->GetMapChipPositionByIndex(5, 0);
 		minoPos[1] = mapChipField_->GetMapChipPositionByIndex(6, 0);
 		minoPos[2] = mapChipField_->GetMapChipPositionByIndex(4, 1);
 		minoPos[3] = mapChipField_->GetMapChipPositionByIndex(5, 1);
+		rotationCenterIndex_ = 2;
 		break;
 	case MinoType::Z:
 		minoPos[0] = mapChipField_->GetMapChipPositionByIndex(4, 0);
 		minoPos[1] = mapChipField_->GetMapChipPositionByIndex(5, 0);
 		minoPos[2] = mapChipField_->GetMapChipPositionByIndex(5, 1);
 		minoPos[3] = mapChipField_->GetMapChipPositionByIndex(6, 1);
+		rotationCenterIndex_ = 2;
 		break;
 	case MinoType::J:
 		minoPos[0] = mapChipField_->GetMapChipPositionByIndex(4, 0);
 		minoPos[1] = mapChipField_->GetMapChipPositionByIndex(4, 1);
 		minoPos[2] = mapChipField_->GetMapChipPositionByIndex(5, 1);
 		minoPos[3] = mapChipField_->GetMapChipPositionByIndex(6, 1);
+		rotationCenterIndex_ = 2;
 		break;
 	case MinoType::L:
 		minoPos[0] = mapChipField_->GetMapChipPositionByIndex(6, 0);
 		minoPos[1] = mapChipField_->GetMapChipPositionByIndex(4, 1);
 		minoPos[2] = mapChipField_->GetMapChipPositionByIndex(5, 1);
 		minoPos[3] = mapChipField_->GetMapChipPositionByIndex(6, 1);
+		rotationCenterIndex_ = 2;
 		break;
 	case MinoType::T:
 		minoPos[0] = mapChipField_->GetMapChipPositionByIndex(5, 0);
 		minoPos[1] = mapChipField_->GetMapChipPositionByIndex(4, 1);
 		minoPos[2] = mapChipField_->GetMapChipPositionByIndex(5, 1);
 		minoPos[3] = mapChipField_->GetMapChipPositionByIndex(6, 1);
+		rotationCenterIndex_ = 2;
 		break;
 	}
 
@@ -239,5 +261,34 @@ void Mino::GenerateMino(Model* model, Camera* camera) {
 		// マップ参照を渡す
 		newMino->SetMapChipField(mapChipField_);
 		minos_.push_back(newMino);
+	}
+}
+
+void Mino::Rotate() {
+	if (rotationCenterIndex_ == 1 || minos_.empty()) {
+		return;
+	}
+	auto it = minos_.begin();
+	std::advance(it, rotationCenterIndex_);
+	Vector3 centerPos = (*it)->worldTransform_.translation_;
+
+	std::vector<Vector3> tentativeBlockPositions;
+	tentativeBlockPositions.reserve(minos_.size());
+	for (Mino* block : minos_) {
+		Vector3 currentBlockPos = block->worldTransform_.translation_;
+		Vector3 relativePos = currentBlockPos - centerPos;
+
+		Vector3 rotatedRelativePos = {-relativePos.y, relativePos.x, relativePos.z};
+
+		Vector3 newBlockPos = centerPos + rotatedRelativePos;
+		tentativeBlockPositions.push_back(newBlockPos);
+
+		if (!CheckCollision(tentativeBlockPositions)) {
+			auto itBlock = minos_.begin();
+			for (const auto& newPos : tentativeBlockPositions) {
+				(*itBlock)->worldTransform_.translation_ = newPos;
+				++itBlock;
+			}
+		}
 	}
 }
