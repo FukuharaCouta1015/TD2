@@ -8,6 +8,8 @@ class MapChipField;
 
 class Mino {
 public:
+	~Mino() = default;
+
 	// 初期化
 	void Initialize(KamataEngine::Model* model, KamataEngine::Camera* camera, const KamataEngine::Vector3& position);
 	// 更新
@@ -15,18 +17,9 @@ public:
 	// 描画
 	void Draw();
 	// ミノを生成
-	// 引数を省略した場合は this->prototypeModel_ / this->prototypeCamera_ を使う
 	void GenerateMino(KamataEngine::Model* model = nullptr, KamataEngine::Camera* camera = nullptr);
-
+	// mapChipFieldをセット
 	void SetMapChipField(MapChipField* mapChipField) { mapChipField_ = mapChipField; }
-
-	~Mino() = default;
-
-private:
-	// 移動
-	void Move();
-	// 当たり判定
-	bool CheckCollision();
 
 private:
 	// ワールドトランスフォーム

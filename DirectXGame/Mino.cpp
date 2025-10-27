@@ -12,7 +12,7 @@ namespace {
 static std::random_device rd;
 static std::mt19937 gen(rd());
 static std::uniform_int_distribution<int> dist(0, 6); // 7種のミノ
-} // namespace
+}
 
 // 初期化
 void Mino::Initialize(Model* model, Camera* camera, const Vector3& position) {
@@ -144,24 +144,6 @@ void Mino::Draw() {
 			mino->model_->Draw(mino->worldTransform_, *mino->camera_);
 		}
 	}
-}
-
-// 移動
-void Mino::Move() {
-	// 旧実装は使わず、Updateで一括移動しているためここは空または互換用に残す
-	// 前フレーム位置を保存
-	prevTranslation_ = worldTransform_.translation_;
-
-	// フレームをカウント（子個別で呼ばれる場合に備え最低限更新）
-	++frameCount;
-
-	// ここでは移動ロジックを Update に統合したため何もしない
-}
-
-// 当たり判定（個別は不要になったが安全のため残す）
-bool Mino::CheckCollision() {
-	// 旧個別チェックは使わない。親の Update で一括処理しているため false を返す。
-	return false;
 }
 
 // ミノを生成
