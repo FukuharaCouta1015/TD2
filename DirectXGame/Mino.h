@@ -5,6 +5,8 @@
 enum class MinoType { I, O, S, Z, J, L, T };
 
 class MapChipField;
+class GameScene;
+
 
 class Mino {
 public:
@@ -22,6 +24,8 @@ public:
 
 	~Mino() = default;
 
+	void SetGameScene(GameScene* gameScene) { gameScene_ = gameScene; }
+
 	void Rotate();
 
 private:
@@ -38,6 +42,7 @@ private:
 	// マップチップフィールド
 	MapChipField* mapChipField_ = nullptr;
 
+	GameScene* gameScene_ = nullptr;
 	// ミノのリスト（子ブロック）
 	std::list<Mino*> minos_;
 	// ミノのタイプ

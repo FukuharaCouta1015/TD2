@@ -57,6 +57,7 @@ void GameScene::Initialize() {
 
 	mino_ = new Mino();
 	mino_->SetMapChipField(mapChipField_);
+	mino_->SetGameScene(this);
 	mino_->GenerateMino(modelBlock_, &camera_);
 }
 
@@ -101,7 +102,6 @@ void GameScene::Update() {
 
 	mino_->Update();
 
-	GenerateBlocks();
 
 	for (std::vector<WorldTransform*>& WorldTransformBlockLine : WorldTransformBlocks_) {
 		for (WorldTransform* WorldTransformBlock : WorldTransformBlockLine) {
@@ -148,6 +148,14 @@ void GameScene::GenerateBlocks() {
 	uint32_t numBlocksHorizontal = mapChipField_->GetNumBlockHorizontal();
 	uint32_t numBlocksVertical = mapChipField_->GetNumBlockVertical();
 
+	for (std::vector<WorldTransform*>& WorldTransformBlockLine : WorldTransformBlocks_) {
+		for (WorldTransform* WorldTransformBlock : WorldTransformBlockLine) {
+			delete WorldTransformBlock;
+		}
+	}
+	WorldTransformBlocks_.clear();
+
+
 	WorldTransformBlocks_.resize(numBlocksVertical);
 	for (uint32_t i = 0; i < numBlocksVertical; ++i) {
 		WorldTransformBlocks_[i].resize(numBlocksHorizontal);
@@ -157,16 +165,13 @@ void GameScene::GenerateBlocks() {
 	for (uint32_t i = 0; i < numBlocksVertical; ++i) {
 
 		for (uint32_t j = 0; j < numBlocksHorizontal; ++j) {
-			if (mapChipField_->GetMapChipTypeByIndex(j, i) == MapChipType::kBlock) {
+			if (mapChipField_->GetMapChipTypeByIndex(j, i) == MapChipType::kBlock || mapChipField_->GetMapChipTypeByIndex(j, i) == MapChipType::kMino) {
 				WorldTransform* worldTransform = new WorldTransform();
 				worldTransform->Initialize();
 				WorldTransformBlocks_[i][j] = worldTransform;
 				WorldTransformBlocks_[i][j]->translation_ = mapChipField_->GetMapChipPositionByIndex(j, i);
-			} else if (mapChipField_->GetMapChipTypeByIndex(j, i) == MapChipType::kMino) {
-				WorldTransform* worldTransform = new WorldTransform();
-				worldTransform->Initialize();
-				WorldTransformBlocks_[i][j] = worldTransform;
-				WorldTransformBlocks_[i][j]->translation_ = mapChipField_->GetMapChipPositionByIndex(j, i);
+			} else {
+				WorldTransformBlocks_[i][j] = nullptr;
 			}
 		}
 	}
