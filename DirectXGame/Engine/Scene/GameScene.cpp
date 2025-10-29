@@ -128,7 +128,7 @@ void GameScene::Update() {
 		camera_.matProjection = debugCamera_->GetCamera().matProjection;
 		camera_.TransferMatrix();
 	} else {
-		camera_.translation_ = {0.0f, 10.0f, -50.0f};
+		camera_.translation_ = {5.0f, 10.0f, -40.0f};
 		camera_.UpdateMatrix();
 		camera_.TransferMatrix();
 	}

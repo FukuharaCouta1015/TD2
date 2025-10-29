@@ -1,7 +1,7 @@
 #include <Windows.h>
 #include "kamataEngine.h"
 #include "SceneManager.h"
-#include <cstdio> // <--- この行を追加
+#include <cstdio> 
 
 using namespace KamataEngine;
 
