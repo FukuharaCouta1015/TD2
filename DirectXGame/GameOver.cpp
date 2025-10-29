@@ -1,42 +1,32 @@
-#include "TitleScene.h"
 #include "MyMath.h"
+#include "GameOver.h"
 #include <numbers>
 
 using namespace KamataEngine;
 
 // デストラクタ
-TitleScene::~TitleScene() {
+GameOverScene::~GameOverScene() {
 	delete model_;
-	delete modelPlayer_;
-	delete tdTitle_;
 	delete fade_;
-	delete gameover_;
+	delete gameOver_;
 }
 
-void TitleScene::Initialize() {
+void GameOverScene::Initialize() {
 	model_ = Model::CreateFromOBJ("titleFont");
-	modelPlayer_ = Model::CreateFromOBJ("player");
-	textureHandle_ = TextureManager::Load("tdTitle.png");
-	gameoverHandle_ = TextureManager::Load("gameover.png");
-	tdTitle_ = Sprite::Create(textureHandle_, {0, 0});
+	gameOverHandle_ = TextureManager::Load("./resources/GameOver.png");
 
 	camera_.Initialize();
 
 	worldTransform_.Initialize();
-	worldTransform_.scale_ = {2.0f, 2.0f, 2.0f};
-	worldTransform_.translation_ = {0, 8, 0};
-
-	worldTransformPlayer_.Initialize();
-	worldTransformPlayer_.scale_ = {10, 10, 10};
-	worldTransformPlayer_.translation_ = {0, -8, 0};
-	worldTransformPlayer_.rotation_.y = std::numbers::pi_v<float>;
+	worldTransform_.scale_ = {1.0f, 1.0f, 1.0f};
+	worldTransform_.translation_ = {0, 0, 0};
 
 	fade_ = new Fade();
 	fade_->Initialize();                     // フェードの初期化
 	fade_->Start(Fade::State::FadeIn, 1.0f); // フェードインを開始
 }
 
-void TitleScene::Update() {
+void GameOverScene::Update() {
 
 	switch (phase_) {
 	case Phase::kMain:
@@ -65,14 +55,10 @@ void TitleScene::Update() {
 
 	// 回転角度を更新
 	rotate += 0.1f;                                                              // 回転速度を調整
-	worldTransformPlayer_.rotation_.y = sin(rotate) + std::numbers::pi_v<float>; // Y軸を中心に回転
 	worldTransform_.rotation_.y = -sin(rotate);                                  // Y軸を中心に回転
-
-	worldTransformPlayer_.matWorld_ = MakeAffineMatrix(worldTransformPlayer_.scale_, worldTransformPlayer_.rotation_, worldTransformPlayer_.translation_);
-	worldTransformPlayer_.TransferMatrix();
 }
 
-void TitleScene::Draw() {
+void GameOverScene::Draw() {
 	// DirectXCommonのインスタンスを取得
 	DirectXCommon* dxCommon = DirectXCommon::GetInstance();
 
@@ -81,14 +67,13 @@ void TitleScene::Draw() {
 
 	model_->Draw(worldTransform_, camera_);
 
-	modelPlayer_->Draw(worldTransformPlayer_, camera_);
-
 	Model::PostDraw();
 
 	Sprite::PreDraw(dxCommon->GetCommandList());
-	tdTitle_->Draw();
-	Sprite::PostDraw();
 
+	gameOver_->Draw();
+
+	Sprite::PostDraw();
 
 	fade_->Draw(); // フェードの描画
 }

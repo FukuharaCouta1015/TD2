@@ -1,11 +1,13 @@
 #pragma once
 #include "GameScene.h"
 #include "TitleScene.h"
+#include "GameOver.h"
 
 enum class SceneType {
 	kUnknown = 0,
 	kTitle,
 	kGame,
+	kGameOver,
 };
 
 class SceneManager {
@@ -22,4 +24,5 @@ private:
 	SceneType currentScene_;
 	GameScene* gameScene_;
 	TitleScene* titleScene_;
+	GameOverScene* gameOverScene_;
 };
