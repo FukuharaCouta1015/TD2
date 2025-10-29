@@ -21,6 +21,7 @@ GameScene::~GameScene() {
 	delete mino_;
 	delete spriteRight_;
 	delete spriteLeft_;
+	delete spriteRotate_; // 追加: 回転ボタン解放
 
 	for (std::vector<WorldTransform*>& WorldTransformBlockLine : WorldTransformBlocks_) {
 		for (WorldTransform* WorldTransformBlock : WorldTransformBlockLine) {
@@ -34,6 +35,7 @@ void GameScene::Initialize() {
 	// 画像の初期化
 	model_ = Model::CreateFromOBJ("player");
 	modelBlock_ = Model::CreateFromOBJ("block");
+	modelMino_ = Model::CreateFromOBJ("block");
 	modelSkydome_ = Model::CreateFromOBJ("skydome", true);
 
 	debugCamera_ = new DebugCamera(1280, 720);
@@ -59,6 +61,7 @@ void GameScene::Initialize() {
 
 	mino_ = new Mino();
 	mino_->SetMapChipField(mapChipField_);
+
 	mino_->SetGameScene(this);
 	mino_->GenerateMino(modelBlock_, &camera_);
 
@@ -68,11 +71,18 @@ void GameScene::Initialize() {
 	const float spacing = 10.0f;
 	spriteLeftPos_ = {spriteRightPos_.x - spriteSize_.x - spacing, spriteRightPos_.y, 0.0f};
 
+	// 追加: 回転ボタンは左右ボタンの上に配置（中央揃え）
+	spriteRotatePos_ = {spriteRightPos_.x - (spriteSize_.x * 0.5f), spriteRightPos_.y - spriteSize_.y - spacing, 0.0f};
+
 	spriteRight_ = Sprite::Create(textureHandleRight_, {spriteRightPos_.x, spriteRightPos_.y});
 	spriteRight_->SetSize({spriteSize_.x, spriteSize_.y});
 
 	spriteLeft_ = Sprite::Create(textureHandleLeft_, {spriteLeftPos_.x, spriteLeftPos_.y});
 	spriteLeft_->SetSize({spriteSize_.x, spriteSize_.y});
+
+	// 追加: 回転ボタンの生成
+	spriteRotate_ = Sprite::Create(textureHandleRotate_, {spriteRotatePos_.x, spriteRotatePos_.y});
+	spriteRotate_->SetSize({spriteSize_.x, spriteSize_.y});
 }
 
 void GameScene::Update() {
@@ -96,6 +106,9 @@ void GameScene::Update() {
 	ProcessSpriteClickMove(spriteLeftPos_, spriteSize_, -1);
 	// 右移動ボタン（元の位置） -> dx = +1
 	ProcessSpriteClickMove(spriteRightPos_, spriteSize_, +1);
+
+	// 追加: 回転ボタンのクリック処理（上に配置したスプライト）
+	ProcessSpriteClickRotate(spriteRotatePos_, spriteSize_);
 
 	fade_->Update();
 
@@ -135,7 +148,6 @@ void GameScene::Update() {
 
 	mino_->Update();
 
-
 	for (std::vector<WorldTransform*>& WorldTransformBlockLine : WorldTransformBlocks_) {
 		for (WorldTransform* WorldTransformBlock : WorldTransformBlockLine) {
 			if (!WorldTransformBlock) {
@@ -165,6 +177,24 @@ bool GameScene::ProcessSpriteClickMove(const KamataEngine::Vector3& spriteLeftTo
 	if (Input::GetInstance()->IsTriggerMouse(0) && mousePos.x >= left && mousePos.x <= right && mousePos.y >= top && mousePos.y <= bottom) {
 		if (mino_) {
 			mino_->RequestMove(dx);
+			return true;
+		}
+	}
+	return false;
+}
+
+// 追加: 回転ボタンの当たり判定とミノ回転要求
+bool GameScene::ProcessSpriteClickRotate(const KamataEngine::Vector3& spriteLeftTop, const KamataEngine::Vector3& spriteSize) {
+	auto mousePos = Input::GetInstance()->GetMousePosition();
+
+	float left = spriteLeftTop.x;
+	float right = spriteLeftTop.x + spriteSize.x;
+	float top = spriteLeftTop.y;
+	float bottom = spriteLeftTop.y + spriteSize.y;
+
+	if (Input::GetInstance()->IsTriggerMouse(0) && mousePos.x >= left && mousePos.x <= right && mousePos.y >= top && mousePos.y <= bottom) {
+		if (mino_) {
+			mino_->Rotate();
 			return true;
 		}
 	}
@@ -206,7 +236,6 @@ void GameScene::GenerateBlocks() {
 	}
 	WorldTransformBlocks_.clear();
 
-
 	WorldTransformBlocks_.resize(numBlocksVertical);
 	for (uint32_t i = 0; i < numBlocksVertical; ++i) {
 		WorldTransformBlocks_[i].resize(numBlocksHorizontal);
@@ -234,6 +263,11 @@ void GameScene::Draw() {
 
 	Sprite::PreDraw(dxCommon->GetCommandList());
 
+	// 追加: 回転スプライトを上に描画
+	if (spriteRotate_) {
+		spriteRotate_->Draw();
+	}
+
 	if (spriteRight_) {
 		spriteRight_->Draw();
 	}
@@ -247,13 +281,20 @@ void GameScene::Draw() {
 	Model::PreDraw(dxCommon->GetCommandList());
 	skydome_->Draw();
 
-	// ブロックの描画
-	for (std::vector<WorldTransform*>& WorldTransformBlockLine : WorldTransformBlocks_) {
-		for (WorldTransform* WorldTransformBlock : WorldTransformBlockLine) {
+	// ブロックの描画（MapChipType に応じて適切なモデル/テクスチャだけ描画する）
+	for (size_t i = 0; i < WorldTransformBlocks_.size(); ++i) {
+		for (size_t j = 0; j < WorldTransformBlocks_[i].size(); ++j) {
+			WorldTransform* WorldTransformBlock = WorldTransformBlocks_[i][j];
 			if (!WorldTransformBlock) {
 				continue;
 			}
-			modelBlock_->Draw(*WorldTransformBlock, camera_);
+			// マップのインデックスは j が横、i が縦（GenerateBlocks と同じ順）
+			MapChipType type = mapChipField_->GetMapChipTypeByIndex(static_cast<uint32_t>(j), static_cast<uint32_t>(i));
+			if (type == MapChipType::kBlock) {
+				modelBlock_->Draw(*WorldTransformBlock, camera_);
+			} else if (type == MapChipType::kMino) {
+				modelMino_->Draw(*WorldTransformBlock, camera_, textureHandleMino_);
+			}
 		}
 	}
 

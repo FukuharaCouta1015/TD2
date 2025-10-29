@@ -42,6 +42,7 @@ private:
 	// マップチップフィールド
 	MapChipField* mapChipField_ = nullptr;
 
+	uint32_t textureHandleMino_ = KamataEngine::TextureManager::Load("./resources/mino.png");
 	GameScene* gameScene_ = nullptr;
 	// ミノのリスト（子ブロック）
 	std::list<Mino*> minos_;

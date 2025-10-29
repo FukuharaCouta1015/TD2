@@ -27,6 +27,8 @@ public:
 
 
 	private:
+	uint32_t textureHandle_ = 0; // テクスチャハンドル
+	KamataEngine::Sprite* tdTitle_ = nullptr;
 	KamataEngine::Model* model_ = nullptr;
 	KamataEngine::Model* modelPlayer_ = nullptr;
 	KamataEngine::Camera camera_ ;

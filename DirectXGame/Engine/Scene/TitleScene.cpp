@@ -8,12 +8,17 @@ using namespace KamataEngine;
 TitleScene::~TitleScene() {
 	delete model_;
 	delete modelPlayer_;
+	delete tdTitle_;
 	delete fade_;
+	
 }
 
 void TitleScene::Initialize() {
 	model_ = Model::CreateFromOBJ("titleFont");
 	modelPlayer_ = Model::CreateFromOBJ("player");
+	textureHandle_ = TextureManager::Load("tdTitle.png");
+
+	tdTitle_ = Sprite::Create(textureHandle_, {0, 0});
 
 	camera_.Initialize();
 
@@ -79,6 +84,11 @@ void TitleScene::Draw() {
 	modelPlayer_->Draw(worldTransformPlayer_, camera_);
 
 	Model::PostDraw();
+
+	Sprite::PreDraw(dxCommon->GetCommandList());
+	tdTitle_->Draw();
+	Sprite::PostDraw();
+
 
 	fade_->Draw(); // フェードの描画
 }
