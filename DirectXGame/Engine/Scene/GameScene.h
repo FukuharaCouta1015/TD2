@@ -38,6 +38,8 @@ public:
 
 	bool IsFinished() const { return finished_; }
 
+	void SetGameOver() { isGameOver_ = true; }
+
 	// モデル
 	KamataEngine::Model* model_ = nullptr;
 	// ブロック
@@ -66,8 +68,13 @@ public:
 private:
 	uint32_t textureHandle_ = 0;
 	Skydome* skydome_ = nullptr;
-	bool finished_ = false; // ゲームシーンが終了したかどうか
+	bool finished_ = false;   // ゲームシーンが終了したかどうか
+	bool isGameOver_ = false; // ゲームオーバーフラグ
 	Fade* fade_ = nullptr;  // フェードオブジェクト
+	
+	// 音声
+	KamataEngine::Audio* audio_ = nullptr;
+	uint32_t soundHandleClick_ = 0;
 
 	// ミノ
 	Mino* mino_ = nullptr;

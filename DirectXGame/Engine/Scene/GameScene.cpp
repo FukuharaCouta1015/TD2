@@ -65,6 +65,10 @@ void GameScene::Initialize() {
 	mino_->SetGameScene(this);
 	mino_->GenerateMino(modelBlock_, &camera_);
 
+	// 追加: オーディオの初期化とクリック音のロード
+	    audio_ = KamataEngine::Audio::GetInstance(); // GetInstance() でインスタンスを取得
+	    audio_->Initialize();
+	    soundHandleClick_ = audio_->LoadWave("./Resources/oto/Culick.wav");
 	// スプライト（左上アンカー扱いで位置を決める）
 	spriteRightPos_ = {300.0f, 300.0f, 0.0f}; // 右移動ボタン（左上）
 	// 左隣は右の左にサイズ分+余白で配置
@@ -104,54 +108,56 @@ void GameScene::Update() {
 
 	// 追加: 回転ボタンのクリック処理（上に配置したスプライト）
 	ProcessSpriteClickRotate(spriteRotatePos_, spriteSize_);
-
 	fade_->Update();
-
-	switch (phase_) {
-	case Phase::kPlay:
-
-		break;
-	case Phase::kDeath:
-
-		break;
-	case Phase::kFadeIn:
-		fade_->Update();
-		break;
-	case Phase::kFadeOut:
-		fade_->Update();
-		break;
-	}
-
-	debugCamera_->Update();
-#ifdef _DEBUG
-	if (Input::GetInstance()->TriggerKey(DIK_0)) {
-		isDebugCameraActive_ = !isDebugCameraActive_;
-	}
-#endif // _DEBUG
-
-	// カメラの処理
-	if (isDebugCameraActive_) {
-		debugCamera_->Update();
-		camera_.matView = debugCamera_->GetCamera().matView;
-		camera_.matProjection = debugCamera_->GetCamera().matProjection;
-		camera_.TransferMatrix();
-	} else {
-		camera_.translation_ = {5.0f, 10.0f, -40.0f};
-		camera_.UpdateMatrix();
-		camera_.TransferMatrix();
-	}
-
-	mino_->Update();
-
-	for (std::vector<WorldTransform*>& WorldTransformBlockLine : WorldTransformBlocks_) {
-		for (WorldTransform* WorldTransformBlock : WorldTransformBlockLine) {
-			if (!WorldTransformBlock) {
-				continue;
-			}
-			WorldTransformBlock->matWorld_ = MakeAffineMatrix(WorldTransformBlock->scale_, WorldTransformBlock->rotation_, WorldTransformBlock->translation_);
-			WorldTransformBlock->TransferMatrix();
-		}
-	}
+        switch (phase_) {
+        case Phase::kPlay:
+    
+            break;
+            case Phase::kDeath:
+        
+            return;     
+			case Phase::kFadeIn:
+        	fade_->Update();
+        	break;
+        case Phase::kFadeOut:
+        	fade_->Update();
+        	break;
+        }
+    
+    	debugCamera_->Update();
+    #ifdef _DEBUG
+    	if (Input::GetInstance()->TriggerKey(DIK_0)) {
+    		isDebugCameraActive_ = !isDebugCameraActive_;
+    	}
+    #endif // _DEBUG
+    
+    	// カメラの処理
+    	if (isDebugCameraActive_) {
+    		debugCamera_->Update();
+    		camera_.matView = debugCamera_->GetCamera().matView;
+    		camera_.matProjection = debugCamera_->GetCamera().matProjection;
+    		camera_.TransferMatrix();
+    	} else {
+    		camera_.translation_ = {5.0f, 10.0f, -40.0f};
+    		camera_.UpdateMatrix();
+    		camera_.TransferMatrix();
+    	}
+    
+    	    mino_->Update();
+    	
+    	    // ゲームオーバー判定
+    	if (isGameOver_ && phase_ == Phase::kPlay) {
+    	        phase_ = Phase::kDeath;
+    	}
+	    for (std::vector<WorldTransform*>& WorldTransformBlockLine : WorldTransformBlocks_) {
+		    for (WorldTransform* WorldTransformBlock : WorldTransformBlockLine) {
+			    if (!WorldTransformBlock) {
+				    continue;
+			    }
+			    WorldTransformBlock->matWorld_ = MakeAffineMatrix(WorldTransformBlock->scale_, WorldTransformBlock->rotation_, WorldTransformBlock->translation_);
+			    WorldTransformBlock->TransferMatrix();
+		    }
+	    }
 
 	CheckAllCollision();
 
@@ -172,6 +178,9 @@ bool GameScene::ProcessSpriteClickMove(const KamataEngine::Vector3& spriteLeftTo
 	if (Input::GetInstance()->IsTriggerMouse(0) && mousePos.x >= left && mousePos.x <= right && mousePos.y >= top && mousePos.y <= bottom) {
 		if (mino_) {
 			mino_->RequestMove(dx);
+			if (audio_) {
+				audio_->PlayWave(soundHandleClick_);
+			}
 			return true;
 		}
 	}
@@ -190,6 +199,9 @@ bool GameScene::ProcessSpriteClickRotate(const KamataEngine::Vector3& spriteLeft
 	if (Input::GetInstance()->IsTriggerMouse(0) && mousePos.x >= left && mousePos.x <= right && mousePos.y >= top && mousePos.y <= bottom) {
 		if (mino_) {
 			mino_->Rotate();
+			if (audio_) {
+				audio_->PlayWave(soundHandleClick_);
+			}
 			return true;
 		}
 	}

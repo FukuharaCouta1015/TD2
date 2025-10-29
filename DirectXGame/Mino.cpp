@@ -170,8 +170,14 @@ void Mino::Update() {
 			uint32_t y = idxPrev.yIndex;
 			// 範囲チェックして書き込み
 			if (x < mapChipField_->GetNumBlockHorizontal() && y < mapChipField_->GetNumBlockVertical()) {
-				mapChipField_->mapChipData_.data_[y][x] = MapChipType::kMino;
-			}
+				                mapChipField_->mapChipData_.data_[y][x] = MapChipType::kMino;
+				
+				                // ここにゲームオーバー判定を追加
+				                if (y == 0) { // y=0 の列にミノが固定されたらゲームオーバー
+				                    if (gameScene_) {
+				                        gameScene_->SetGameOver();
+				                    }
+				                }			}
 		}
 		mapChipField_->ClearFullines();
 		if (gameScene_) {
