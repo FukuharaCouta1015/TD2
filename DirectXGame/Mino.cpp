@@ -215,8 +215,8 @@ bool Mino::CheckCollision(const std::vector<Vector3>& tentativeBlockPositions) {
 	}
 	for (const auto& pos : tentativeBlockPositions) {
 		MapChipField::IndexSet indexSet = mapChipField_->GetMapChipIndexByPosition(pos);
-		uint32_t xIndex = static_cast<int>(indexSet.xIndex);
-		uint32_t yIndex = static_cast<int>(indexSet.yIndex);
+		uint32_t xIndex = indexSet.xIndex;
+		uint32_t yIndex = indexSet.yIndex;
 		if (xIndex >= mapChipField_->GetNumBlockHorizontal() || yIndex >= mapChipField_->GetNumBlockVertical()) {
 			return true;
 		}
@@ -313,10 +313,30 @@ void Mino::GenerateMino(Model* model, Camera* camera) {
 
 	// ミノを生成
 	for (uint32_t i = 0; i < 4; ++i) {
+		MapChipField::IndexSet idx = mapChipField_->GetMapChipIndexByPosition(minoPos[i]);
+
+		if (idx.xIndex>= mapChipField_->GetNumBlockHorizontal() || idx.yIndex >= mapChipField_->GetNumBlockVertical() || (idx.xIndex!=(uint32_t) -1) &&(int)idx.xIndex<0){
+			
+		}
+
+		MapChipType type = mapChipField_->GetMapChipTypeByIndex(idx.xIndex, idx.yIndex);
+		if (type == MapChipType::kBlock || type == MapChipType::kMino) {
+			// 生成位置に既にブロックがある場合、ゲームオーバー処理を呼び出す
+			if (gameScene_) {
+				gameScene_->SetGameOver(true);
+			}
+			for (Mino* m : minos_) {
+				delete m;
+			}
+			minos_.clear();
+			return;
+		}
+
 		Mino* newMino = new Mino();
 		newMino->Initialize(model, camera, minoPos[i]);
 		// マップ参照を渡す
 		newMino->SetMapChipField(mapChipField_);
+		newMino->SetGameScene(gameScene_);
 		minos_.push_back(newMino);
 	}
 }

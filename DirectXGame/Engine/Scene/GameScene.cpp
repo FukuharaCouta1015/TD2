@@ -76,6 +76,11 @@ void GameScene::Initialize() {
 }
 
 void GameScene::Update() {
+	if (isGameOver_) {
+
+		return;
+	}
+
 	auto mousePos = Input::GetInstance()->GetMousePosition();
 	ImGui::Begin("Window");
 	ImGui::Text("mousePos %d %d", static_cast<int>(mousePos.x), static_cast<int>(mousePos.y));

@@ -30,10 +30,7 @@ public:
 
 	void Rotate();
 
-private:
-
-	// 当たり判定
-	bool CheckCollision();
+	void SetGameOver();
 
 private:
 	// ワールドトランスフォーム

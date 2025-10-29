@@ -62,6 +62,9 @@ public:
 
 	Phase phase_;
 
+	bool ImGameOver() const { return isGameOver_; }
+	void SetGameOver(bool gameOver) { isGameOver_ = gameOver; }
+
 private:
 	uint32_t textureHandle_ = 0;
 	Skydome* skydome_ = nullptr;
@@ -86,4 +89,6 @@ private:
 	// 当たり判定と移動要求送信を行う汎用関数
 	// dx: -1 = 左移動要求, +1 = 右移動要求
 	bool ProcessSpriteClickMove(const KamataEngine::Vector3& spriteLeftTop, const KamataEngine::Vector3& spriteSize, int dx);
+
+	bool isGameOver_ = false;
 };
