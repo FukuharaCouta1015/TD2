@@ -21,6 +21,7 @@ GameScene::~GameScene() {
 	delete mino_;
 	delete spriteRight_;
 	delete spriteLeft_;
+	delete spriteRotate_; // 追加: 回転ボタン解放
 
 	for (std::vector<WorldTransform*>& WorldTransformBlockLine : WorldTransformBlocks_) {
 		for (WorldTransform* WorldTransformBlock : WorldTransformBlockLine) {
@@ -70,11 +71,18 @@ void GameScene::Initialize() {
 	const float spacing = 10.0f;
 	spriteLeftPos_ = {spriteRightPos_.x - spriteSize_.x - spacing, spriteRightPos_.y, 0.0f};
 
+	// 追加: 回転ボタンは左右ボタンの上に配置（中央揃え）
+	spriteRotatePos_ = {spriteRightPos_.x - (spriteSize_.x * 0.5f), spriteRightPos_.y - spriteSize_.y - spacing, 0.0f};
+
 	spriteRight_ = Sprite::Create(textureHandleRight_, {spriteRightPos_.x, spriteRightPos_.y});
 	spriteRight_->SetSize({spriteSize_.x, spriteSize_.y});
 
 	spriteLeft_ = Sprite::Create(textureHandleLeft_, {spriteLeftPos_.x, spriteLeftPos_.y});
 	spriteLeft_->SetSize({spriteSize_.x, spriteSize_.y});
+
+	// 追加: 回転ボタンの生成
+	spriteRotate_ = Sprite::Create(textureHandleRotate_, {spriteRotatePos_.x, spriteRotatePos_.y});
+	spriteRotate_->SetSize({spriteSize_.x, spriteSize_.y});
 }
 
 void GameScene::Update() {
@@ -93,6 +101,9 @@ void GameScene::Update() {
 	ProcessSpriteClickMove(spriteLeftPos_, spriteSize_, -1);
 	// 右移動ボタン（元の位置） -> dx = +1
 	ProcessSpriteClickMove(spriteRightPos_, spriteSize_, +1);
+
+	// 追加: 回転ボタンのクリック処理（上に配置したスプライト）
+	ProcessSpriteClickRotate(spriteRotatePos_, spriteSize_);
 
 	fade_->Update();
 
@@ -125,13 +136,12 @@ void GameScene::Update() {
 		camera_.matProjection = debugCamera_->GetCamera().matProjection;
 		camera_.TransferMatrix();
 	} else {
-		camera_.translation_ = {0.0f, 10.0f, -50.0f};
+		camera_.translation_ = {5.0f, 10.0f, -40.0f};
 		camera_.UpdateMatrix();
 		camera_.TransferMatrix();
 	}
 
 	mino_->Update();
-
 
 	for (std::vector<WorldTransform*>& WorldTransformBlockLine : WorldTransformBlocks_) {
 		for (WorldTransform* WorldTransformBlock : WorldTransformBlockLine) {
@@ -162,6 +172,24 @@ bool GameScene::ProcessSpriteClickMove(const KamataEngine::Vector3& spriteLeftTo
 	if (Input::GetInstance()->IsTriggerMouse(0) && mousePos.x >= left && mousePos.x <= right && mousePos.y >= top && mousePos.y <= bottom) {
 		if (mino_) {
 			mino_->RequestMove(dx);
+			return true;
+		}
+	}
+	return false;
+}
+
+// 追加: 回転ボタンの当たり判定とミノ回転要求
+bool GameScene::ProcessSpriteClickRotate(const KamataEngine::Vector3& spriteLeftTop, const KamataEngine::Vector3& spriteSize) {
+	auto mousePos = Input::GetInstance()->GetMousePosition();
+
+	float left = spriteLeftTop.x;
+	float right = spriteLeftTop.x + spriteSize.x;
+	float top = spriteLeftTop.y;
+	float bottom = spriteLeftTop.y + spriteSize.y;
+
+	if (Input::GetInstance()->IsTriggerMouse(0) && mousePos.x >= left && mousePos.x <= right && mousePos.y >= top && mousePos.y <= bottom) {
+		if (mino_) {
+			mino_->Rotate();
 			return true;
 		}
 	}
@@ -203,7 +231,6 @@ void GameScene::GenerateBlocks() {
 	}
 	WorldTransformBlocks_.clear();
 
-
 	WorldTransformBlocks_.resize(numBlocksVertical);
 	for (uint32_t i = 0; i < numBlocksVertical; ++i) {
 		WorldTransformBlocks_[i].resize(numBlocksHorizontal);
@@ -230,6 +257,11 @@ void GameScene::Draw() {
 	DirectXCommon* dxCommon = DirectXCommon::GetInstance();
 
 	Sprite::PreDraw(dxCommon->GetCommandList());
+
+	// 追加: 回転スプライトを上に描画
+	if (spriteRotate_) {
+		spriteRotate_->Draw();
+	}
 
 	if (spriteRight_) {
 		spriteRight_->Draw();
