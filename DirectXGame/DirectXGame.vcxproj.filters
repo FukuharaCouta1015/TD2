@@ -45,12 +45,6 @@
     <ClCompile Include="MapChipField.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
-    <ClCompile Include="Engine\Camera\CameraController.cpp">
-      <Filter>ソース ファイル</Filter>
-    </ClCompile>
-    <ClCompile Include="DeathParticles.cpp">
-      <Filter>ソース ファイル</Filter>
-    </ClCompile>
     <ClCompile Include="Fade.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
@@ -67,6 +61,9 @@
       <Filter>ソース ファイル</Filter>
     </ClCompile>
     <ClCompile Include="Engine\Scene\SceneManager.cpp">
+      <Filter>ソース ファイル\scene</Filter>
+    </ClCompile>
+    <ClCompile Include="GameOver.cpp">
       <Filter>ソース ファイル\scene</Filter>
     </ClCompile>
   </ItemGroup>
@@ -132,12 +129,6 @@
     <ClInclude Include="MapChipField.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
-    <ClInclude Include="Engine\Camera\CameraController.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
-    <ClInclude Include="DeathParticles.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
     <ClInclude Include="Fade.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
@@ -157,6 +148,9 @@
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
     <ClInclude Include="Engine\Scene\SceneManager.h">
+      <Filter>ヘッダー ファイル\scene</Filter>
+    </ClInclude>
+    <ClInclude Include="GameOver.h">
       <Filter>ヘッダー ファイル\scene</Filter>
     </ClInclude>
   </ItemGroup>
