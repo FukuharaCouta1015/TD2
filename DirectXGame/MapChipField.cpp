@@ -1,6 +1,7 @@
 #include "MapChipField.h"
 #include "kamataEngine.h"
 #include <fstream>
+#include <iostream>
 #include <map>
 #include <sstream>
 #include <vector>
@@ -79,6 +80,75 @@ MapChipType MapChipField::GetMapChipTypeByIndex(uint32_t xIndex, uint32_t yIndex
 
 KamataEngine::Vector3 MapChipField::GetMapChipPositionByIndex(uint32_t xIndex, uint32_t yIndex) {
 	return KamataEngine::Vector3(kBlockWidth * xIndex, kBlockHeight * (kNumBlocksVertical - 1 - yIndex), 0);
+}
+
+void MapChipField::ClearFullines() { 
+	printf("ClearFullines: --- Before --- frame: (unknown frame)\n");
+	for (int i = kNumBlocksVertical - 1; i >= 0; --i) { // 上から下に表示
+		printf("Row %2d: ", i);
+		for (uint32_t j = 0; j < kNumBlocksHorizontal; ++j) {
+			printf("%d ", (int)mapChipData_.data_[i][j]);
+		}
+		printf("\n");
+	}
+	printf("----------------------------\n");
+
+    uint32_t y = 0;
+    while (y < kNumBlocksVertical - 1) { // y=20 の行は判定しない
+        bool isLineFull = true;
+        for (uint32_t x = 1; x < kNumBlocksHorizontal - 1; ++x) { // 左右の壁は除く
+            if (mapChipData_.data_[y][x] == MapChipType::kBlank) {
+                isLineFull = false;
+                break;
+            }
+        }
+
+        if (isLineFull) {
+            printf("ClearFullines: Line FULL detected at y=%u\n", y);
+
+            // ★変更箇所★: 揃った行 (y) から最上行までを一つずつ下にシフトする
+            // moveY は消去された行 (y) から最上行の一つ手前 (kNumBlocksVertical-1) まで
+            // 下から上にコピーするループに変更
+            for (uint32_t moveY = y; moveY > 0; --moveY) { 
+                for (uint32_t x = 1; x < kNumBlocksHorizontal - 1; ++x) {
+                    // moveY 行に moveY-1 行の内容をコピー
+                    // kBlock は動かないので、moveY 行が kBlock でない場合のみコピー
+                    if (mapChipData_.data_[moveY][x] != MapChipType::kBlock) {
+                        if (mapChipData_.data_[moveY-1][x] != MapChipType::kBlock) {
+                            mapChipData_.data_[moveY][x] = mapChipData_.data_[moveY-1][x];
+                        } else {
+                            mapChipData_.data_[moveY][x] = MapChipType::kBlank; // 上の行が壁なら空白にする
+                        }
+                    }
+                }
+            }
+            
+            // 最上行 (y=0) は必ず空白にする (壁は除く)
+            for (uint32_t x = 1; x < kNumBlocksHorizontal - 1; ++x) {
+                if (mapChipData_.data_[0][x] != MapChipType::kBlock) {
+                    mapChipData_.data_[0][x] = MapChipType::kBlank;
+                }
+            }
+
+            // 行が揃った場合は、y の値を変更せず、同じ行をもう一度チェックする
+            // (上の行が落ちてきて、再びこの行が揃う可能性があるため)
+            // printf("ClearFullines: Re-checking current y=%u after clearing.\n", y);
+
+        } else {
+            // 行が揃っていない場合は y をインクリメントして次の行へ
+            ++y;
+        }
+    }
+
+	printf("ClearFullines: --- After --- frame: (unknown frame)\n");
+	for (int i = kNumBlocksVertical - 1; i >= 0; --i) { // 上から下に表示
+		printf("Row %2d: ", i);
+		for (uint32_t j = 0; j < kNumBlocksHorizontal; ++j) {
+			printf("%d ", (int)mapChipData_.data_[i][j]);
+		}
+		printf("\n");
+	}
+	printf("---------------------------\n");
 }
 
 MapChipField::IndexSet MapChipField::GetMapChipIndexByPosition(const KamataEngine::Vector3& position) {

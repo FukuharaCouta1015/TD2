@@ -5,6 +5,8 @@
 enum class MinoType { I, O, S, Z, J, L, T };
 
 class MapChipField;
+class GameScene;
+
 
 class Mino {
 public:
@@ -22,11 +24,13 @@ public:
 
 	~Mino() = default;
 
+	void SetGameScene(GameScene* gameScene) { gameScene_ = gameScene; }
+
+	void Rotate();
+
 private:
 	// 移動
 	void Move();
-	// 当たり判定
-	bool CheckCollision();
 
 private:
 	// ワールドトランスフォーム
@@ -38,6 +42,7 @@ private:
 	// マップチップフィールド
 	MapChipField* mapChipField_ = nullptr;
 
+	GameScene* gameScene_ = nullptr;
 	// ミノのリスト（子ブロック）
 	std::list<Mino*> minos_;
 	// ミノのタイプ
@@ -52,4 +57,9 @@ private:
 	// 親が保持する「生成用」モデルとカメラ（子削除時の誤クリア対策）
 	KamataEngine::Model* prototypeModel_ = nullptr;
 	KamataEngine::Camera* prototypeCamera_ = nullptr;
+	// 回転中心のインデックス
+	int rotationCenterIndex_ = -1;
+
+	bool CheckCollision(const std::vector<KamataEngine::Vector3>& tentativeBlockPositions);
+
 };

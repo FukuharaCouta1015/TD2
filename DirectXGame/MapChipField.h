@@ -43,6 +43,8 @@ public:
 
 	KamataEngine::Vector3 GetMapChipPositionByIndex(uint32_t xIndex, uint32_t yIndex);
 
+	void ClearFullines();
+
 	MapChipData mapChipData_;
 
 	// インデックスセット
