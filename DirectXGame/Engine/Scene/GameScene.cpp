@@ -8,7 +8,7 @@
 #include <map>
 
 using namespace KamataEngine;
-
+//
 // デストラクタ
 GameScene::~GameScene() {
 	delete model_;
