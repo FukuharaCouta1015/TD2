@@ -34,6 +34,7 @@ void GameScene::Initialize() {
 	// 画像の初期化
 	model_ = Model::CreateFromOBJ("player");
 	modelBlock_ = Model::CreateFromOBJ("block");
+	modelMino_ = Model::CreateFromOBJ("block");
 	modelSkydome_ = Model::CreateFromOBJ("skydome", true);
 
 	debugCamera_ = new DebugCamera(1280, 720);
@@ -59,6 +60,7 @@ void GameScene::Initialize() {
 
 	mino_ = new Mino();
 	mino_->SetMapChipField(mapChipField_);
+
 	mino_->SetGameScene(this);
 	mino_->GenerateMino(modelBlock_, &camera_);
 
@@ -242,13 +244,20 @@ void GameScene::Draw() {
 	Model::PreDraw(dxCommon->GetCommandList());
 	skydome_->Draw();
 
-	// ブロックの描画
-	for (std::vector<WorldTransform*>& WorldTransformBlockLine : WorldTransformBlocks_) {
-		for (WorldTransform* WorldTransformBlock : WorldTransformBlockLine) {
+	// ブロックの描画（MapChipType に応じて適切なモデル/テクスチャだけ描画する）
+	for (size_t i = 0; i < WorldTransformBlocks_.size(); ++i) {
+		for (size_t j = 0; j < WorldTransformBlocks_[i].size(); ++j) {
+			WorldTransform* WorldTransformBlock = WorldTransformBlocks_[i][j];
 			if (!WorldTransformBlock) {
 				continue;
 			}
-			modelBlock_->Draw(*WorldTransformBlock, camera_);
+			// マップのインデックスは j が横、i が縦（GenerateBlocks と同じ順）
+			MapChipType type = mapChipField_->GetMapChipTypeByIndex(static_cast<uint32_t>(j), static_cast<uint32_t>(i));
+			if (type == MapChipType::kBlock) {
+				modelBlock_->Draw(*WorldTransformBlock, camera_);
+			} else if (type == MapChipType::kMino) {
+				modelMino_->Draw(*WorldTransformBlock, camera_, textureHandleMino_);
+			}
 		}
 	}
 
