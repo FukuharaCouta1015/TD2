@@ -178,7 +178,7 @@ void Mino::Draw() {
 	for (Mino* mino : minos_) {
 		// 子の model_/camera_ は生成時に渡した共有ポインタ（所有せず使い回す）
 		if (mino->model_ && mino->camera_) {
-			mino->model_->Draw(mino->worldTransform_, *mino->camera_);
+			mino->model_->Draw(mino->worldTransform_, *mino->camera_, textureHandleMino_);
 		}
 	}
 }

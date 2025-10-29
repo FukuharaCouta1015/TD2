@@ -34,6 +34,7 @@ void GameScene::Initialize() {
 	// 画像の初期化
 	model_ = Model::CreateFromOBJ("player");
 	modelBlock_ = Model::CreateFromOBJ("block");
+	modelMino_ = Model::CreateFromOBJ("block");
 	modelSkydome_ = Model::CreateFromOBJ("skydome", true);
 
 	debugCamera_ = new DebugCamera(1280, 720);
@@ -59,7 +60,7 @@ void GameScene::Initialize() {
 
 	mino_ = new Mino();
 	mino_->SetMapChipField(mapChipField_);
-	mino_->GenerateMino(modelBlock_, &camera_);
+	mino_->GenerateMino(modelMino_, &camera_);
 
 	// スプライト（左上アンカー扱いで位置を決める）
 	spriteRightPos_ = {300.0f, 300.0f, 0.0f}; // 右移動ボタン（左上）
@@ -239,6 +240,7 @@ void GameScene::Draw() {
 				continue;
 			}
 			modelBlock_->Draw(*WorldTransformBlock, camera_);
+			modelMino_->Draw(*WorldTransformBlock, camera_, textureHandleMino_);
 		}
 	}
 

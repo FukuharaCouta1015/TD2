@@ -38,6 +38,8 @@ public:
 	KamataEngine::Model* model_ = nullptr;
 	// ブロック
 	KamataEngine::Model* modelBlock_ = nullptr;
+	// ミノ
+	KamataEngine::Model* modelMino_ = nullptr;
 	// 天球
 	KamataEngine::Model* modelSkydome_ = nullptr;
 	// ワールドトランスフォーム
@@ -65,6 +67,7 @@ private:
 
 	// ミノ
 	Mino* mino_ = nullptr;
+	uint32_t textureHandleMino_ = KamataEngine::TextureManager::Load("./resources/mino.png");
 
 	uint32_t textureHandleRight_ = KamataEngine::TextureManager::Load("./resources/arrow/right.png");
 	uint32_t textureHandleLeft_ = KamataEngine::TextureManager::Load("./resources/arrow/left.png");
