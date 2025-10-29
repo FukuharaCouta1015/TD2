@@ -233,14 +233,20 @@ void GameScene::Draw() {
 	Model::PreDraw(dxCommon->GetCommandList());
 	skydome_->Draw();
 
-	// ブロックの描画
-	for (std::vector<WorldTransform*>& WorldTransformBlockLine : WorldTransformBlocks_) {
-		for (WorldTransform* WorldTransformBlock : WorldTransformBlockLine) {
+	// ブロックの描画（MapChipType に応じて適切なモデル/テクスチャだけ描画する）
+	for (size_t i = 0; i < WorldTransformBlocks_.size(); ++i) {
+		for (size_t j = 0; j < WorldTransformBlocks_[i].size(); ++j) {
+			WorldTransform* WorldTransformBlock = WorldTransformBlocks_[i][j];
 			if (!WorldTransformBlock) {
 				continue;
 			}
-			modelBlock_->Draw(*WorldTransformBlock, camera_);
-			modelMino_->Draw(*WorldTransformBlock, camera_, textureHandleMino_);
+			// マップのインデックスは j が横、i が縦（GenerateBlocks と同じ順）
+			MapChipType type = mapChipField_->GetMapChipTypeByIndex(static_cast<uint32_t>(j), static_cast<uint32_t>(i));
+			if (type == MapChipType::kBlock) {
+				modelBlock_->Draw(*WorldTransformBlock, camera_);
+			} else if (type == MapChipType::kMino) {
+				modelMino_->Draw(*WorldTransformBlock, camera_, textureHandleMino_);
+			}
 		}
 	}
 
