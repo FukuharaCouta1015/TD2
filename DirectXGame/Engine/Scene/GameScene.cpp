@@ -67,11 +67,6 @@ void GameScene::Initialize() {
 	const float spacing = 10.0f;
 	spriteLeftPos_ = {spriteRightPos_.x - spriteSize_.x - spacing, spriteRightPos_.y, 0.0f};
 
-	// 描画用 Sprite はエンジンが中心基準で描画することが多い想定なので、
-	// 描画時に左上 -> 中心へ補正して渡す（エンジンが左上基準なら補正不要）
-	//KamataEngine::Vector3 drawPosRight = {spriteRightPos_.x + spriteSize_.x / 2.0f, spriteRightPos_.y + spriteSize_.y / 2.0f, 0.0f};
-	//KamataEngine::Vector3 drawPosLeft = {spriteLeftPos_.x + spriteSize_.x / 2.0f, spriteLeftPos_.y + spriteSize_.y / 2.0f, 0.0f};
-
 	spriteRight_ = Sprite::Create(textureHandleRight_, {spriteRightPos_.x, spriteRightPos_.y});
 	spriteRight_->SetSize({spriteSize_.x, spriteSize_.y});
 
