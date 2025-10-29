@@ -8,7 +8,7 @@
 #include <random>
 #include"GameScene.h"
 using namespace KamataEngine;
-
+//変更
 // 乱数エンジンをファイルスコープで一度だけ作成（GenerateMino 内で再作成しない）
 namespace {
 static std::random_device rd;
