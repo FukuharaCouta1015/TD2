@@ -2,16 +2,45 @@
 #include "MapChipField.h"
 #include "MyMath.h"
 #include "WorldTransform.h"
+#include <algorithm>
+#include <array>
 #include <cassert>
 #include <random>
 
-    using namespace KamataEngine;
+using namespace KamataEngine;
 
 // 乱数エンジンをファイルスコープで一度だけ作成（GenerateMino 内で再作成しない）
 namespace {
 static std::random_device rd;
 static std::mt19937 gen(rd());
-static std::uniform_int_distribution<int> dist(0, 6); // 7種のミノ
+
+// 7-Bag 用の袋（0..6 をシャッフルして順に取り出す）
+static std::array<int, 7> bag;
+static int bagIndex = 7; // 7 のときは「袋が空」、補充が必要
+
+// 直前に生成したミノの種類を記憶（袋の補充時に境界重複を防ぐために使う）
+static bool hasPrevMinoType = false;
+static MinoType prevMinoType = MinoType::I;
+
+// 袋を補充してシャッフル（補充後、袋[0] が直前と同じなら交換して防ぐ）
+static void RefillBag() {
+	for (int i = 0; i < 7; ++i) {
+		bag[i] = i;
+	}
+	std::shuffle(bag.begin(), bag.end(), gen);
+
+	if (hasPrevMinoType && bag[0] == static_cast<int>(prevMinoType)) {
+		// bag[0] と異なる要素を探して交換
+		for (int i = 1; i < 7; ++i) {
+			if (bag[i] != static_cast<int>(prevMinoType)) {
+				std::swap(bag[0], bag[i]);
+				break;
+			}
+		}
+		// 万が一全要素が同じ（理論上ありえない）はそのまま
+	}
+	bagIndex = 0;
+}
 } // namespace
 
 // 初期化
@@ -171,8 +200,16 @@ void Mino::GenerateMino(Model* model, Camera* camera) {
 	// 最終的にモデル/カメラが無ければ原因を分かりやすくするためアサート
 	assert(model && camera);
 
-	// 乱数エンジンはファイルスコープのものを使う（ここでは再作成しない）
-	minoType_ = static_cast<MinoType>(dist(gen));
+	// 7-Bag から取り出す（袋が空なら補充）
+	if (bagIndex >= 7) {
+		RefillBag();
+	}
+	int candidate = bag[bagIndex++];
+	minoType_ = static_cast<MinoType>(candidate);
+
+	// 直前種類を更新
+	prevMinoType = minoType_;
+	hasPrevMinoType = true;
 
 	Vector3 minoPos[4];
 
