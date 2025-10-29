@@ -2,9 +2,9 @@
 #include "DeathParticles.h"
 #include "Fade.h"
 #include "MapChipField.h"
+#include "Mino.h"
 #include "MyMath.h"
 #include "Player.h"
-#include "Mino.h"
 #include <map>
 
 using namespace KamataEngine;
@@ -19,6 +19,8 @@ GameScene::~GameScene() {
 	delete mapChipField_;
 	delete fade_;
 	delete mino_;
+	delete spriteRight_;
+	delete spriteLeft_;
 
 	for (std::vector<WorldTransform*>& WorldTransformBlockLine : WorldTransformBlocks_) {
 		for (WorldTransform* WorldTransformBlock : WorldTransformBlockLine) {
@@ -48,7 +50,7 @@ void GameScene::Initialize() {
 
 	skydome_ = new Skydome();
 	skydome_->Initialize(modelSkydome_, &camera_);
-	
+
 	phase_ = Phase::kPlay;
 
 	fade_ = new Fade();
@@ -58,19 +60,50 @@ void GameScene::Initialize() {
 	mino_ = new Mino();
 	mino_->SetMapChipField(mapChipField_);
 	mino_->GenerateMino(modelBlock_, &camera_);
+
+	// スプライト（左上アンカー扱いで位置を決める）
+	spriteRightPos_ = {300.0f, 300.0f, 0.0f}; // 右移動ボタン（左上）
+	// 左隣は右の左にサイズ分+余白で配置
+	const float spacing = 10.0f;
+	spriteLeftPos_ = {spriteRightPos_.x - spriteSize_.x - spacing, spriteRightPos_.y, 0.0f};
+
+	// 描画用 Sprite はエンジンが中心基準で描画することが多い想定なので、
+	// 描画時に左上 -> 中心へ補正して渡す（エンジンが左上基準なら補正不要）
+	//KamataEngine::Vector3 drawPosRight = {spriteRightPos_.x + spriteSize_.x / 2.0f, spriteRightPos_.y + spriteSize_.y / 2.0f, 0.0f};
+	//KamataEngine::Vector3 drawPosLeft = {spriteLeftPos_.x + spriteSize_.x / 2.0f, spriteLeftPos_.y + spriteSize_.y / 2.0f, 0.0f};
+
+	spriteRight_ = Sprite::Create(textureHandleRight_, {spriteRightPos_.x, spriteRightPos_.y});
+	spriteRight_->SetSize({spriteSize_.x, spriteSize_.y});
+
+	spriteLeft_ = Sprite::Create(textureHandleLeft_, {spriteLeftPos_.x, spriteLeftPos_.y});
+	spriteLeft_->SetSize({spriteSize_.x, spriteSize_.y});
 }
 
 void GameScene::Update() {
+	auto mousePos = Input::GetInstance()->GetMousePosition();
+	ImGui::Begin("Window");
+	ImGui::Text("mousePos %d %d", static_cast<int>(mousePos.x), static_cast<int>(mousePos.y));
+	ImGui::End();
+
+	// マウス左クリック（トリガー）で現在の座標を取得してログ出力
+	if (Input::GetInstance()->IsTriggerMouse(0)) { // 0 = 左ボタン
+		auto pos = Input::GetInstance()->GetMousePosition();
+	}
+
+	// --- スプライト左右両方の当たり判定を関数化して処理 ---
+	// 左移動ボタン（左隣） -> dx = -1
+	ProcessSpriteClickMove(spriteLeftPos_, spriteSize_, -1);
+	// 右移動ボタン（元の位置） -> dx = +1
+	ProcessSpriteClickMove(spriteRightPos_, spriteSize_, +1);
 
 	fade_->Update();
 
 	switch (phase_) {
 	case Phase::kPlay:
-		
+
 		break;
 	case Phase::kDeath:
 
-		
 		break;
 	case Phase::kFadeIn:
 		fade_->Update();
@@ -94,8 +127,8 @@ void GameScene::Update() {
 		camera_.matProjection = debugCamera_->GetCamera().matProjection;
 		camera_.TransferMatrix();
 	} else {
+		camera_.translation_ = {0.0f, 10.0f, -50.0f};
 		camera_.UpdateMatrix();
-		
 		camera_.TransferMatrix();
 	}
 
@@ -118,17 +151,35 @@ void GameScene::Update() {
 	ChangePhase();
 }
 
-void GameScene::CheckAllCollision() {
-	
+bool GameScene::ProcessSpriteClickMove(const KamataEngine::Vector3& spriteLeftTop, const KamataEngine::Vector3& spriteSize, int dx) {
+	// マウス座標（クライアントピクセル、左上原点）を取得
+	auto mousePos = Input::GetInstance()->GetMousePosition();
+
+	// スプライトは左上アンカー前提で当たり判定
+	float left = spriteLeftTop.x;
+	float right = spriteLeftTop.x + spriteSize.x;
+	float top = spriteLeftTop.y;
+	float bottom = spriteLeftTop.y + spriteSize.y;
+
+	// クリックがトリガーかつマウスがスプライト内ならミノに移動要求を送る
+	if (Input::GetInstance()->IsTriggerMouse(0) && mousePos.x >= left && mousePos.x <= right && mousePos.y >= top && mousePos.y <= bottom) {
+		if (mino_) {
+			mino_->RequestMove(dx);
+			return true;
+		}
+	}
+	return false;
 }
+
+void GameScene::CheckAllCollision() {}
 
 void GameScene::ChangePhase() {
 	switch (phase_) {
 	case Phase::kPlay:
-		
+
 		break;
 	case Phase::kDeath:
-		
+
 		break;
 	case Phase::kFadeIn:
 		if (fade_->IsFinished()) {
@@ -170,6 +221,17 @@ void GameScene::GenerateBlocks() {
 void GameScene::Draw() {
 
 	DirectXCommon* dxCommon = DirectXCommon::GetInstance();
+
+	Sprite::PreDraw(dxCommon->GetCommandList());
+
+	if (spriteRight_) {
+		spriteRight_->Draw();
+	}
+	if (spriteLeft_) {
+		spriteLeft_->Draw();
+	}
+
+	Sprite::PostDraw();
 
 	// 描画開始
 	Model::PreDraw(dxCommon->GetCommandList());

@@ -5,14 +5,14 @@
 #include <cassert>
 #include <random>
 
-using namespace KamataEngine;
+    using namespace KamataEngine;
 
 // 乱数エンジンをファイルスコープで一度だけ作成（GenerateMino 内で再作成しない）
 namespace {
 static std::random_device rd;
 static std::mt19937 gen(rd());
 static std::uniform_int_distribution<int> dist(0, 6); // 7種のミノ
-}
+} // namespace
 
 // 初期化
 void Mino::Initialize(Model* model, Camera* camera, const Vector3& position) {
@@ -29,6 +29,9 @@ void Mino::Initialize(Model* model, Camera* camera, const Vector3& position) {
 	prevTranslation_ = worldTransform_.translation_;
 }
 
+// 外部からの移動要求（dx: -1 左, +1 右）
+void Mino::RequestMove(int dx) { moveRequest_ = dx; }
+
 // 更新
 void Mino::Update() {
 	// 親インスタンスが管理するミノ群の移動はここで一括制御する
@@ -43,9 +46,15 @@ void Mino::Update() {
 		dx = +1;
 	}
 
+	// 外部からの移動要求があれば優先して適用
+	if (moveRequest_ != 0) {
+		dx = moveRequest_;
+		moveRequest_ = 0;
+	}
+
 	// 落下（-1:下へ1マス） - 親のフレームで判定
 	int dy = 0;
-	if (frameCount % 20 == 19) {
+	if (frameCount % 15 == 14) {
 		dy = -1;
 	}
 
@@ -64,8 +73,7 @@ void Mino::Update() {
 			Vector3 target = mino->worldTransform_.translation_;
 			target.x += dx;
 			auto idx = mapChipField_->GetMapChipIndexByPosition(target);
-			if (mapChipField_->GetMapChipTypeByIndex(idx.xIndex, idx.yIndex) == MapChipType::kBlock 
-				|| mapChipField_->GetMapChipTypeByIndex(idx.xIndex, idx.yIndex) == MapChipType::kMino) {
+			if (mapChipField_->GetMapChipTypeByIndex(idx.xIndex, idx.yIndex) == MapChipType::kBlock || mapChipField_->GetMapChipTypeByIndex(idx.xIndex, idx.yIndex) == MapChipType::kMino) {
 				blocked = true;
 				break;
 			}

@@ -14,6 +14,8 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 	SceneManager sceneManager;
 	sceneManager.Initialize();
 
+	ImGuiManager* imguiManager = ImGuiManager::GetInstance();
+
 	//メインループ
 	while (true) {
 		// エンジンの更新
@@ -21,14 +23,20 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 			break;
 		}
 
+		imguiManager->Begin();
+
 		// sceneManagerの更新
 		sceneManager.ChangeScene();
 		sceneManager.Update();
+
+		imguiManager->End();
 
 		// 描画開始
 		dxCommon->PreDraw();
 
 		sceneManager.Draw();
+
+		imguiManager->Draw();
 
 		// 描画終了
 		dxCommon->PostDraw();

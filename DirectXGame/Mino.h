@@ -21,6 +21,9 @@ public:
 	// mapChipFieldをセット
 	void SetMapChipField(MapChipField* mapChipField) { mapChipField_ = mapChipField; }
 
+	// 外部からの移動要求（dx: -1 左, +1 右）
+	void RequestMove(int dx);
+
 private:
 	// ワールドトランスフォーム
 	KamataEngine::WorldTransform worldTransform_;
@@ -45,4 +48,7 @@ private:
 	// 親が保持する「生成用」モデルとカメラ（子削除時の誤クリア対策）
 	KamataEngine::Model* prototypeModel_ = nullptr;
 	KamataEngine::Camera* prototypeCamera_ = nullptr;
+
+	// 外部からの移動要求（1フレームのみ適用）
+	int moveRequest_ = 0;
 };
