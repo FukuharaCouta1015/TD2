@@ -2,6 +2,8 @@
 #include "MapChipField.h"
 #include "MyMath.h"
 #include "WorldTransform.h"
+#include <algorithm>
+#include <array>
 #include <cassert>
 #include <random>
 #include"GameScene.h"
@@ -11,7 +13,34 @@ using namespace KamataEngine;
 namespace {
 static std::random_device rd;
 static std::mt19937 gen(rd());
-static std::uniform_int_distribution<int> dist(0, 6); // 7種のミノ
+
+// 7-Bag 用の袋（0..6 をシャッフルして順に取り出す）
+static std::array<int, 7> bag;
+static int bagIndex = 7; // 7 のときは「袋が空」、補充が必要
+
+// 直前に生成したミノの種類を記憶（袋の補充時に境界重複を防ぐために使う）
+static bool hasPrevMinoType = false;
+static MinoType prevMinoType = MinoType::I;
+
+// 袋を補充してシャッフル（補充後、袋[0] が直前と同じなら交換して防ぐ）
+static void RefillBag() {
+	for (int i = 0; i < 7; ++i) {
+		bag[i] = i;
+	}
+	std::shuffle(bag.begin(), bag.end(), gen);
+
+	if (hasPrevMinoType && bag[0] == static_cast<int>(prevMinoType)) {
+		// bag[0] と異なる要素を探して交換
+		for (int i = 1; i < 7; ++i) {
+			if (bag[i] != static_cast<int>(prevMinoType)) {
+				std::swap(bag[0], bag[i]);
+				break;
+			}
+		}
+		// 万が一全要素が同じ（理論上ありえない）はそのまま
+	}
+	bagIndex = 0;
+}
 } // namespace
 
 // 初期化
@@ -28,6 +57,9 @@ void Mino::Initialize(Model* model, Camera* camera, const Vector3& position) {
 	// 前フレーム位置を初期化
 	prevTranslation_ = worldTransform_.translation_;
 }
+
+// 外部からの移動要求（dx: -1 左, +1 右）
+void Mino::RequestMove(int dx) { moveRequest_ = dx; }
 
 // 更新
 void Mino::Update() {
@@ -48,9 +80,15 @@ void Mino::Update() {
 		dx = +1;
 	}
 
+	// 外部からの移動要求があれば優先して適用
+	if (moveRequest_ != 0) {
+		dx = moveRequest_;
+		moveRequest_ = 0;
+	}
+
 	// 落下（-1:下へ1マス） - 親のフレームで判定
 	int dy = 0;
-	if (frameCount % 20 == 19) {
+	if (frameCount % 15 == 14) {
 		dy = -1;
 	}
 
@@ -73,8 +111,7 @@ void Mino::Update() {
 			Vector3 target = mino->worldTransform_.translation_;
 			target.x += dx;
 			auto idx = mapChipField_->GetMapChipIndexByPosition(target);
-			if (mapChipField_->GetMapChipTypeByIndex(idx.xIndex, idx.yIndex) == MapChipType::kBlock 
-				|| mapChipField_->GetMapChipTypeByIndex(idx.xIndex, idx.yIndex) == MapChipType::kMino) {
+			if (mapChipField_->GetMapChipTypeByIndex(idx.xIndex, idx.yIndex) == MapChipType::kBlock || mapChipField_->GetMapChipTypeByIndex(idx.xIndex, idx.yIndex) == MapChipType::kMino) {
 				blocked = true;
 				break;
 			}
@@ -169,17 +206,7 @@ void Mino::Draw() {
 	}
 }
 
-// 移動
-void Mino::Move() {
-	// 旧実装は使わず、Updateで一括移動しているためここは空または互換用に残す
-	// 前フレーム位置を保存
-	prevTranslation_ = worldTransform_.translation_;
 
-	// フレームをカウント（子個別で呼ばれる場合に備え最低限更新）
-	++frameCount;
-
-	// ここでは移動ロジックを Update に統合したため何もしない
-}
 
 // 当たり判定
 bool Mino::CheckCollision(const std::vector<Vector3>& tentativeBlockPositions) {
@@ -218,8 +245,16 @@ void Mino::GenerateMino(Model* model, Camera* camera) {
 	// 最終的にモデル/カメラが無ければ原因を分かりやすくするためアサート
 	assert(model && camera);
 
-	// 乱数エンジンはファイルスコープのものを使う（ここでは再作成しない）
-	minoType_ = static_cast<MinoType>(dist(gen));
+	// 7-Bag から取り出す（袋が空なら補充）
+	if (bagIndex >= 7) {
+		RefillBag();
+	}
+	int candidate = bag[bagIndex++];
+	minoType_ = static_cast<MinoType>(candidate);
+
+	// 直前種類を更新
+	prevMinoType = minoType_;
+	hasPrevMinoType = true;
 
 	Vector3 minoPos[4];
 

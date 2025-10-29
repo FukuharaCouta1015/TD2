@@ -10,6 +10,8 @@ class GameScene;
 
 class Mino {
 public:
+	~Mino() = default;
+
 	// 初期化
 	void Initialize(KamataEngine::Model* model, KamataEngine::Camera* camera, const KamataEngine::Vector3& position);
 	// 更新
@@ -17,20 +19,21 @@ public:
 	// 描画
 	void Draw();
 	// ミノを生成
-	// 引数を省略した場合は this->prototypeModel_ / this->prototypeCamera_ を使う
 	void GenerateMino(KamataEngine::Model* model = nullptr, KamataEngine::Camera* camera = nullptr);
-
+	// mapChipFieldをセット
 	void SetMapChipField(MapChipField* mapChipField) { mapChipField_ = mapChipField; }
 
-	~Mino() = default;
+	// 外部からの移動要求（dx: -1 左, +1 右）
+	void RequestMove(int dx);
 
 	void SetGameScene(GameScene* gameScene) { gameScene_ = gameScene; }
 
 	void Rotate();
 
 private:
-	// 移動
-	void Move();
+
+	// 当たり判定
+	bool CheckCollision();
 
 private:
 	// ワールドトランスフォーム
@@ -62,4 +65,7 @@ private:
 
 	bool CheckCollision(const std::vector<KamataEngine::Vector3>& tentativeBlockPositions);
 
+
+	// 外部からの移動要求（1フレームのみ適用）
+	int moveRequest_ = 0;
 };
