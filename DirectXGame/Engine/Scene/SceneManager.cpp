@@ -15,37 +15,7 @@ void SceneManager::Initialize() {
 	gameScene_ = nullptr;
 }
 
-void SceneManager::ChangeScene() {
-	switch (currentScene_) {
-	case SceneType::kTitle:
-		if (titleScene_ && titleScene_->IsFinished()) {
-			currentScene_ = SceneType::kGame;
-			delete titleScene_;
-			titleScene_ = nullptr;
-			gameScene_ = new GameScene();
-			gameScene_->Initialize();
-		}
-		break;
-	case SceneType::kGame:
-		if (gameScene_ && gameScene_->IsFinished()) {
-			currentScene_ = SceneType::kGameOver;
-			delete gameScene_;
-			gameScene_ = nullptr;
-			gameOverScene_ = new GameOverScene();
-			gameOverScene_->Initialize();
-		}
-		break;
-	case SceneType::kGameOver:
-		if (gameOverScene_ && gameOverScene_->IsFinished()) {
-			currentScene_ = SceneType::kTitle;
-			delete gameOverScene_;
-			gameOverScene_ = nullptr;
-			titleScene_ = new TitleScene();
-			titleScene_->Initialize();
-		}
-		break;
-	}
-}
+
 
 void SceneManager::ChangeScene() {
 	switch (currentScene_) {

@@ -14,6 +14,7 @@ GameOverScene::~GameOverScene() {
 void GameOverScene::Initialize() {
 	model_ = Model::CreateFromOBJ("titleFont");
 	gameOverHandle_ = TextureManager::Load("./resources/GameOver.png");
+	gameOver_ = Sprite::Create(gameOverHandle_, {0, 0});
 
 	camera_.Initialize();
 
@@ -71,7 +72,9 @@ void GameOverScene::Draw() {
 
 	Sprite::PreDraw(dxCommon->GetCommandList());
 
-	gameOver_->Draw();
+	if (gameOver_) {
+		gameOver_->Draw();
+	}
 
 	Sprite::PostDraw();
 

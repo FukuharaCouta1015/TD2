@@ -114,13 +114,17 @@ void GameScene::Update() {
     
             break;
             case Phase::kDeath:
-        
+		    phase_ = Phase::kFadeOut;
+		    fade_->Start(Fade::State::FadeOut, 1.0f);
             return;     
 			case Phase::kFadeIn:
         	fade_->Update();
         	break;
         case Phase::kFadeOut:
         	fade_->Update();
+		    if (fade_->IsFinished()) {
+			    finished_ = true; // フェードアウトが完了したらタイトルシーンを終了
+		    }
         	break;
         }
     
