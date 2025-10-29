@@ -36,6 +36,11 @@ void TitleScene::Initialize() {
 	fade_->Start(Fade::State::FadeIn, 1.0f); // フェードインを開始
 }
 
+
+
+/// <summary>
+/// 
+/// </summary>
 void TitleScene::Update() {
 
 	switch (phase_) {
