@@ -32,3 +32,18 @@ bool IsCollision(const AABB& aabb1, const AABB& aabb2){
 			(aabb1.min.z <= aabb2.max.z && aabb1.max.z >= aabb2.min.z);
 	
 }
+Vector3 operator+(Vector3& lhs, const Vector3& rhv) {
+	Vector3 result = lhs;
+	result.x += rhv.x;
+	result.y += rhv.y;
+	result.z += rhv.z;
+	return result;
+}
+
+Vector3 operator-(Vector3& lhs, const Vector3& rhv) {
+	Vector3 result = lhs;
+	result.x -= rhv.x;
+	result.y -= rhv.y;
+	result.z -= rhv.z;
+	return result;
+}

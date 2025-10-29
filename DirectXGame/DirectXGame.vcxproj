@@ -114,9 +114,6 @@
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="Engine\Camera\CameraController.cpp" />
-    <ClCompile Include="Engine\Particle\DeathParticles.cpp" />
-    <ClCompile Include="Enemy.cpp" />
     <ClCompile Include="Fade.cpp" />
     <ClCompile Include="Engine\Scene\SceneManager.cpp" />
     <ClCompile Include="Engine\Scene\GameScene.cpp" />
@@ -205,9 +202,6 @@
     <None Include="Resources\shaders\Sprite.hlsli" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Engine\Camera\CameraController.h" />
-    <ClInclude Include="Engine\Particle\DeathParticles.h" />
-    <ClInclude Include="Enemy.h" />
     <ClInclude Include="Fade.h" />
     <ClInclude Include="Engine\Scene\SceneManager.h" />
     <ClInclude Include="Engine\Scene\GameScene.h" />

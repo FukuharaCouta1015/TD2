@@ -1,10 +1,19 @@
 #include <Windows.h>
 #include "kamataEngine.h"
 #include "SceneManager.h"
+#include <cstdio> // <--- この行を追加
+
 using namespace KamataEngine;
 
 // Windowsアプリでのエントリーポイント(main関数)
 int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
+    // デバッグ用のコンソールウィンドウを作成 (DEBUGビルドでのみ有効にするのが一般的)
+#ifdef _DEBUG
+    AllocConsole(); // コンソールをアタッチ
+    FILE* fp;
+    freopen_s(&fp, "CONOUT$", "w", stdout); // stdout をコンソールにリダイレクト
+#endif
+
 	// KamataEngineの初期化
 	KamataEngine::Initialize(L"TD2_2166");
 
@@ -44,5 +53,9 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 
 	//エンジンの終了処理
 	KamataEngine::Finalize();
+#ifdef _DEBUG
+    // プログラム終了時にコンソールを解放 (オプション)
+    FreeConsole();
+#endif
 	return 0;
 }

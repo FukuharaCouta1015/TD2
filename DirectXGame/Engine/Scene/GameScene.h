@@ -30,6 +30,11 @@ public:
 
 	void ChangePhase();
 
+
+	KamataEngine::Sprite* sprite_ = nullptr;
+
+	//uint32_t textureHandle_ = 0;	
+
 	MapChipField* mapChipField_ = nullptr;
 
 	bool IsFinished() const { return finished_; }
